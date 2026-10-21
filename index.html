@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -223,11 +224,6 @@
           Estado: <span id="txt-normal">Activado</span>
         </button>
       </div>
-
-      <div class="status-box">
-        Modelo actual: <br>
-        <span id="rutaModelo">modelos/desgastado.glb</span>
-      </div>
     </div>
   </div>
 
@@ -235,7 +231,6 @@
     const viewer = document.getElementById('escudoViewer');
     const precarga = document.getElementById('precarga');
     const cargando = document.getElementById('cargando');
-    const rutaModeloTxt = document.getElementById('rutaModelo');
 
     const rutas = [
       'modelos/desgastado.glb',
@@ -299,7 +294,6 @@
       }, { once: true });
 
       viewer.src = nuevoSrc;
-      rutaModeloTxt.innerText = ruta;
     }
 
     // ---------- Lógica de los botones ----------
