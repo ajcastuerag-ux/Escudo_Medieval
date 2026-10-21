@@ -4,22 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Armería Medieval - Visor de Escudo 3D</title>
-  
-  <!-- Carga del componente <model-viewer> de Google -->
+
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-  
-  <!-- Fuente estilo medieval/fantasía desde Google Fonts -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=MedievalSharp&display=swap" rel="stylesheet">
 
   <style>
-    /* Reset básico */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background: radial-gradient(circle at center, #2a1f1d 0%, #110c0b 100%);
@@ -32,26 +25,18 @@
       padding: 20px;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 8px #000;
-    }
+    header { text-align: center; margin-bottom: 20px; text-shadow: 2px 2px 8px #000; }
 
     header h1 {
       font-family: 'MedievalSharp', cursive;
       font-size: 2.8rem;
-      color: #d4af37; /* Dorado */
+      color: #d4af37;
       letter-spacing: 2px;
       margin-bottom: 5px;
     }
 
-    header p {
-      font-size: 1rem;
-      color: #a89f91;
-    }
+    header p { font-size: 1rem; color: #a89f91; }
 
-    /* Contenedor Principal */
     .container {
       display: flex;
       flex-direction: row;
@@ -63,7 +48,6 @@
       align-items: stretch;
     }
 
-    /* Estilos del Visor 3D */
     .viewer-card {
       flex: 1 1 500px;
       min-height: 500px;
@@ -75,14 +59,41 @@
       position: relative;
     }
 
-    model-viewer {
+    #escudoViewer {
       width: 100%;
       height: 100%;
       min-height: 500px;
       --poster-color: transparent;
     }
 
-    /* Panel de Controles Medieval */
+    /* Visor invisible que solo sirve para precargar */
+    #precarga {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #cargando {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(18, 12, 10, 0.95);
+      color: #a89f91;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      z-index: 5;
+      transition: opacity 0.4s ease;
+    }
+
+    #cargando.oculto {
+      opacity: 0;
+      pointer-events: none;
+    }
+
     .controls-card {
       flex: 0 1 340px;
       background: #1c1412;
@@ -104,19 +115,10 @@
       text-align: center;
     }
 
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .control-group { display: flex; flex-direction: column; gap: 8px; }
 
-    .control-group label {
-      font-size: 0.95rem;
-      color: #c5b399;
-      letter-spacing: 1px;
-    }
+    .control-group label { font-size: 0.95rem; color: #c5b399; letter-spacing: 1px; }
 
-    /* Botones temáticos */
     .btn-medieval {
       background: linear-gradient(180deg, #4a3525 0%, #2c1e14 100%);
       color: #f1e5d1;
@@ -140,11 +142,8 @@
       box-shadow: 0 6px 12px rgba(212, 175, 55, 0.2);
     }
 
-    .btn-medieval:active {
-      transform: translateY(1px);
-    }
+    .btn-medieval:active { transform: translateY(1px); }
 
-    /* Indicador de archivo cargado */
     .status-box {
       margin-top: auto;
       padding: 10px;
@@ -157,19 +156,11 @@
       word-break: break-all;
     }
 
-    .status-box span {
-      color: #d4af37;
-      font-weight: bold;
-    }
+    .status-box span { color: #d4af37; font-weight: bold; }
 
-    /* Responsivo para celulares */
     @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
-      .viewer-card {
-        min-height: 380px;
-      }
+      .container { flex-direction: column; }
+      .viewer-card { min-height: 380px; }
     }
   </style>
 </head>
@@ -181,11 +172,10 @@
   </header>
 
   <div class="container">
-    <!-- Visor 3D con iluminación neutra tenue que no quema los materiales -->
     <div class="viewer-card">
-      <model-viewer 
+      <!-- UN SOLO visor real (su src se asigna cuando termina la precarga) -->
+      <model-viewer
         id="escudoViewer"
-        src="modelos/desgastado.glb"
         alt="Escudo Medieval 3D"
         auto-rotate
         camera-controls
@@ -196,13 +186,16 @@
         tone-mapping="neutral"
         ar>
       </model-viewer>
+
+      <!-- Visor oculto que solo sirve para llenar la caché -->
+      <model-viewer id="precarga" loading="eager" environment-image="neutral"></model-viewer>
+
+      <div id="cargando">Cargando armería...</div>
     </div>
 
-    <!-- Panel de Botones Interactivos -->
     <div class="controls-card">
       <h2>Opciones de Forja</h2>
 
-      <!-- Botón 1: Estado / Textura -->
       <div class="control-group">
         <label>1. Textura General</label>
         <button class="btn-medieval" onclick="cambiarModelo('textura')">
@@ -210,7 +203,6 @@
         </button>
       </div>
 
-      <!-- Botón 2: Color Acero (Con espacio entre Color y Número) -->
       <div class="control-group">
         <label>2. Acero del Escudo</label>
         <button class="btn-medieval" onclick="cambiarModelo('acero')">
@@ -218,7 +210,6 @@
         </button>
       </div>
 
-      <!-- Botón 3: Grabado Cuero -->
       <div class="control-group">
         <label>3. Grabado en Cuero</label>
         <button class="btn-medieval" onclick="cambiarModelo('grabado')">
@@ -226,7 +217,6 @@
         </button>
       </div>
 
-      <!-- Botón 4: Normal Map -->
       <div class="control-group">
         <label>4. Relieve / Normal Map</label>
         <button class="btn-medieval" onclick="cambiarModelo('normal')">
@@ -234,7 +224,6 @@
         </button>
       </div>
 
-      <!-- Muestra la ruta del GLB cargado actualmente -->
       <div class="status-box">
         Modelo actual: <br>
         <span id="rutaModelo">modelos/desgastado.glb</span>
@@ -244,52 +233,115 @@
 
   <script>
     const viewer = document.getElementById('escudoViewer');
+    const precarga = document.getElementById('precarga');
+    const cargando = document.getElementById('cargando');
     const rutaModeloTxt = document.getElementById('rutaModelo');
 
-    // Estado interno inicializado con 'desgastado'
+    const rutas = [
+      'modelos/desgastado.glb',
+      'modelos/limpio.glb',
+      'modelos/color1.glb',
+      'modelos/color2.glb',
+      'modelos/color3.glb',
+      'modelos/grabado1.glb',
+      'modelos/grabado2.glb',
+      'modelos/Sin Normal Map.glb'
+    ];
+
+    // ---------- Precarga: llena la caché interna de model-viewer ----------
+    function esperarCarga(mv) {
+      return new Promise(resolve => {
+        const fin = () => {
+          mv.removeEventListener('load', fin);
+          mv.removeEventListener('error', fin);
+          resolve();
+        };
+        mv.addEventListener('load', fin);
+        mv.addEventListener('error', fin);
+      });
+    }
+
+    async function precargarTodo() {
+      await customElements.whenDefined('model-viewer');
+
+      // Que la caché guarde todos los modelos (por defecto son 10)
+      const clase = customElements.get('model-viewer');
+      clase.modelCacheSize = 12;
+
+      for (const ruta of rutas) {
+        const espera = esperarCarga(precarga);
+        precarga.src = encodeURI(ruta);
+        await espera;
+      }
+
+      // Ya están todos en caché: el visor real carga el primero al instante
+      const espera = esperarCarga(viewer);
+      viewer.src = encodeURI('modelos/desgastado.glb');
+      await espera;
+
+      cargando.classList.add('oculto');
+      precarga.remove();
+    }
+
+    precargarTodo();
+
+    // ---------- Cambio de modelo (mismo visor, el giro no se detiene) ----------
+    function cargarGLB(ruta) {
+      const nuevoSrc = encodeURI(ruta);
+      if (viewer.getAttribute('src') === nuevoSrc) return;
+
+      // Guarda el ángulo actual para que no salte al cambiar
+      const o = viewer.getCameraOrbit();
+      const orbit = `${o.theta}rad ${o.phi}rad ${o.radius}m`;
+
+      viewer.addEventListener('load', () => {
+        viewer.cameraOrbit = orbit;
+      }, { once: true });
+
+      viewer.src = nuevoSrc;
+      rutaModeloTxt.innerText = ruta;
+    }
+
+    // ---------- Lógica de los botones ----------
     const estado = {
-      textura: 'desgastado', // 'desgastado' o 'limpio'
-      acero: 'color1',       // 'color1', 'color2', 'color3'
-      grabado: 'grabado1',   // 'grabado1', 'grabado2'
-      normal: 'activado'     // 'activado' o 'desactivado'
+      textura: 'desgastado',
+      acero: 'color1',
+      grabado: 'grabado1',
+      normal: 'activado'
     };
 
     function cambiarModelo(tipo) {
       if (tipo === 'textura') {
         estado.textura = estado.textura === 'desgastado' ? 'limpio' : 'desgastado';
-        document.getElementById('txt-textura').innerText = estado.textura === 'desgastado' ? 'Desgastado' : 'Limpio';
-        
+        document.getElementById('txt-textura').innerText =
+          estado.textura === 'desgastado' ? 'Desgastado' : 'Limpio';
         cargarGLB(`modelos/${estado.textura}.glb`);
-      } 
+      }
       else if (tipo === 'acero') {
         if (estado.acero === 'color1') estado.acero = 'color2';
         else if (estado.acero === 'color2') estado.acero = 'color3';
         else estado.acero = 'color1';
 
-        // Formatea el texto con espacio limpio (ej. "Color 1", "Color 2", "Color 3")
         const numeroColor = estado.acero.replace('color', '');
         document.getElementById('txt-acero').innerText = `Color ${numeroColor}`;
-        
         cargarGLB(`modelos/${estado.acero}.glb`);
-      } 
+      }
       else if (tipo === 'grabado') {
         estado.grabado = estado.grabado === 'grabado1' ? 'grabado2' : 'grabado1';
-        document.getElementById('txt-grabado').innerText = estado.grabado === 'grabado1' ? 'Grabado 1' : 'Grabado 2';
-        
+        document.getElementById('txt-grabado').innerText =
+          estado.grabado === 'grabado1' ? 'Grabado 1' : 'Grabado 2';
         cargarGLB(`modelos/${estado.grabado}.glb`);
-      } 
+      }
       else if (tipo === 'normal') {
         estado.normal = estado.normal === 'activado' ? 'desactivado' : 'activado';
-        document.getElementById('txt-normal').innerText = estado.normal === 'activado' ? 'Activado' : 'Desactivado';
-        
-        const modeloRuta = estado.normal === 'desactivado' ? 'modelos/Sin Normal Map.glb' : 'modelos/desgastado.glb';
+        document.getElementById('txt-normal').innerText =
+          estado.normal === 'activado' ? 'Activado' : 'Desactivado';
+
+        const modeloRuta = estado.normal === 'desactivado'
+          ? 'modelos/Sin Normal Map.glb'
+          : 'modelos/desgastado.glb';
         cargarGLB(modeloRuta);
       }
-    }
-
-    function cargarGLB(ruta) {
-      viewer.src = ruta;
-      rutaModeloTxt.innerText = ruta;
     }
   </script>
 

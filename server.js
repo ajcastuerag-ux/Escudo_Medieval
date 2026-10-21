@@ -1,4 +1,5 @@
 const express = require('express');
+const compression = require('compression');
 const path = require('path');
 const app = express();
 
@@ -19,7 +20,19 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname)));
-app.listen(process.env.PORT || 8080, '0.0.0.0');
+app.use(compression());
 
-//Prueba 
+app.use(express.static(path.join(__dirname), {
+  maxAge: '7d',
+  etag: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+    if (filePath.endsWith('.glb')) {
+      res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+    }
+  }
+}));
+
+app.listen(process.env.PORT || 8080, '0.0.0.0');
