@@ -41,7 +41,7 @@
     header h1 {
       font-family: 'MedievalSharp', cursive;
       font-size: 2.8rem;
-      color: #d4af37;
+      color: #d4af37; /* Dorado */
       letter-spacing: 2px;
       margin-bottom: 5px;
     }
@@ -144,6 +144,24 @@
       transform: translateY(1px);
     }
 
+    /* Indicador de archivo cargado */
+    .status-box {
+      margin-top: auto;
+      padding: 10px;
+      background: #120c0a;
+      border: 1px dashed #5c4322;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #8c7f70;
+      text-align: center;
+      word-break: break-all;
+    }
+
+    .status-box span {
+      color: #d4af37;
+      font-weight: bold;
+    }
+
     /* Responsivo para celulares */
     @media (max-width: 768px) {
       .container {
@@ -163,7 +181,7 @@
   </header>
 
   <div class="container">
-    <!-- Visor 3D -->
+    <!-- Visor 3D con iluminación neutra tenue que no quema los materiales -->
     <div class="viewer-card">
       <model-viewer 
         id="escudoViewer"
@@ -192,7 +210,7 @@
         </button>
       </div>
 
-      <!-- Botón 2: Color Acero -->
+      <!-- Botón 2: Color Acero (Con espacio entre Color y Número) -->
       <div class="control-group">
         <label>2. Acero del Escudo</label>
         <button class="btn-medieval" onclick="cambiarModelo('acero')">
@@ -215,18 +233,25 @@
           Estado: <span id="txt-normal">Activado</span>
         </button>
       </div>
+
+      <!-- Muestra la ruta del GLB cargado actualmente -->
+      <div class="status-box">
+        Modelo actual: <br>
+        <span id="rutaModelo">modelos/desgastado.glb</span>
+      </div>
     </div>
   </div>
 
   <script>
     const viewer = document.getElementById('escudoViewer');
+    const rutaModeloTxt = document.getElementById('rutaModelo');
 
     // Estado interno inicializado con 'desgastado'
     const estado = {
-      textura: 'desgastado',
-      acero: 'color1',
-      grabado: 'grabado1',
-      normal: 'activado'
+      textura: 'desgastado', // 'desgastado' o 'limpio'
+      acero: 'color1',       // 'color1', 'color2', 'color3'
+      grabado: 'grabado1',   // 'grabado1', 'grabado2'
+      normal: 'activado'     // 'activado' o 'desactivado'
     };
 
     function cambiarModelo(tipo) {
@@ -241,6 +266,7 @@
         else if (estado.acero === 'color2') estado.acero = 'color3';
         else estado.acero = 'color1';
 
+        // Formatea el texto con espacio limpio (ej. "Color 1", "Color 2", "Color 3")
         const numeroColor = estado.acero.replace('color', '');
         document.getElementById('txt-acero').innerText = `Color ${numeroColor}`;
         
@@ -263,6 +289,7 @@
 
     function cargarGLB(ruta) {
       viewer.src = ruta;
+      rutaModeloTxt.innerText = ruta;
     }
   </script>
 
